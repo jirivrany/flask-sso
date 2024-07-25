@@ -38,10 +38,11 @@ from .version import __version__
 class SSOAttributeError(Exception):
     """General SSO Attribute error."""
 
+
 # Signals
 _signals = Namespace()
 
-sso_logged_in = _signals.signal('sso-logged-in')
+sso_logged_in = _signals.signal("sso-logged-in")
 """Sent when a user is logged in.
 
 In addition to the app (which is the sender), it is passed `user`, which is
@@ -64,20 +65,18 @@ class SSO(object):
         """Initialize a Flask application."""
         self.app = app
         # Follow the Flask guidelines on usage of app.extensions
-        if not hasattr(app, 'extensions'):
+        if not hasattr(app, "extensions"):
             app.extensions = {}
-        if 'sso' in app.extensions:
+        if "sso" in app.extensions:
             raise RuntimeError("Flask application already initialized")
-        app.extensions['sso'] = self
+        app.extensions["sso"] = self
 
         # Set default configuration
-        app.config.setdefault('SSO_LOGIN_URL', config.SSO_LOGIN_URL)
-        app.config.setdefault('SSO_LOGIN_ENDPOINT', config.SSO_LOGIN_ENDPOINT)
-        app.config.setdefault('SSO_ATTRIBUTE_MAP', config.SSO_ATTRIBUTE_MAP)
+        app.config.setdefault("SSO_LOGIN_URL", config.SSO_LOGIN_URL)
+        app.config.setdefault("SSO_LOGIN_ENDPOINT", config.SSO_LOGIN_ENDPOINT)
+        app.config.setdefault("SSO_ATTRIBUTE_MAP", config.SSO_ATTRIBUTE_MAP)
 
-        app.add_url_rule(app.config.get('SSO_LOGIN_URL'),
-                         app.config.get('SSO_LOGIN_ENDPOINT'),
-                         self.login)
+        app.add_url_rule(app.config.get("SSO_LOGIN_URL"), app.config.get("SSO_LOGIN_ENDPOINT"), self.login)
 
     def login_handler(self, callback):
         """Set the callback for the `login` method.
@@ -117,15 +116,16 @@ class SSO(object):
         """Parse arguments from environment variables."""
         attrs = {}
         error = False
-        for header, attr in self.app.config['SSO_ATTRIBUTE_MAP'].items():
+        for header, attr in self.app.config["SSO_ATTRIBUTE_MAP"].items():
+            print(f"HEADER: {header}, ATTR: {attr}")
             required, name = attr
             value = request.environ.get(header, None)
-
+            print(f"HEADER: {header}, ATTR: {attr}, VALUE: {value}")
             attrs[name] = value
-            if not value or value == '':
+            if not value or value == "":
                 if required:
                     error = True
         return attrs, error
 
 
-__all__ = ('SSO', '__version__')
+__all__ = ("SSO", "__version__")
